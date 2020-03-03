@@ -24,6 +24,7 @@ php artisan queue:work
 ```
 docker exec -it parser_builder sh
 cd front
+npm i
 npm run serve
 ```
 
