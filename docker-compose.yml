@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+
+  web:
+    container_name: parser_web
+    build: ./configs/nginx
+    ports:
+      - "443:443"
+    volumes:
+      - ./storage/logs:/var/log/nginx
+      - ./src:/var/www:rw
+    links:
+      - php
+      - builder
+
+  php:
+    container_name: parser_php-fpm
+    build: ./configs/php
+    volumes:
+      - ./src:/var/www:rw
+    working_dir: /var/www
+    links:
+      - postgres
+      - redis
+
+  postgres:
+    container_name: parser_postgres
+    image: postgres:12.0
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+
+  redis:
+    container_name: parser_redis
+    build: ./configs/redis
+    volumes:
+      - ./storage/redis:/data:rw
+    ports:
+      - 6379:6379
+
+  echo:
+    container_name: parser_echo
+    build: ./configs/echo
+    volumes:
+      - ./src/:/var/www/:rw
+    working_dir: /var/www/echo
+    ports:
+      - 6001:6001
+    links:
+      - redis
+
+  builder:
+    container_name: parser_builder
+    build: ./configs/builder
+    ports:
+      - 8080:8080
+    volumes:
+      - ./src:/var/www:rw
+    working_dir: /var/www
+    links:
+      - postgres
+      - redis
+
+volumes:
+  postgres:
