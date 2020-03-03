@@ -3,6 +3,8 @@
 ## Описание
 Парсер постов с rbc.ru.
 
+![](demo.gif)
+
 ## Установка
 ```
 docker-compose up -d --build
